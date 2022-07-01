@@ -1,0 +1,3 @@
+*.temp
+# Large file : More than 50 MB (in the shell : "find * -size +50M | cat >> .gitignore")
+14year.nc
