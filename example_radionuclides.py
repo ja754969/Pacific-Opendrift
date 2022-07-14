@@ -6,20 +6,32 @@ Radionuclides
 
 from opendrift.readers import reader_netCDF_CF_generic, reader_ROMS_native
 from opendrift.models.radionuclides import RadionuclideDrift
+from opendrift.readers import reader_global_landmask
 from datetime import timedelta, datetime
 import numpy as np
+import netCDF4 as nc
+from pprint import pprint
 
 
-o = RadionuclideDrift(loglevel=0, seed=0)  # Set loglevel to 0 for debug information
+o = RadionuclideDrift(loglevel=20, seed=20)  # Set loglevel to 0 for debug information
 
 # Norkyst
-#reader_norkyst = reader_netCDF_CF_generic.Reader(o.test_data_folder() + '/14Jan2016_NorKyst_z_3d/NorKyst-800m_ZDEPTHS_his_00_3Dsubset.nc')
-reader_norkyst = reader_netCDF_CF_generic.Reader('https://thredds.met.no/thredds/dodsC/sea/norkyst800m/1h/aggregate_be')
-# reader_norkyst = reader_netCDF_CF_generic.Reader('14year.nc')
+# file_name = 'https://thredds.met.no/thredds/dodsC/sea/norkyst800m/1h/aggregate_be'
 
-o.add_reader([reader_norkyst])
+file_name = 'E:/git-repos/OpenDrift/pre_process/my_cmems_2000.nc'
+reader_norkyst = reader_netCDF_CF_generic.Reader(file_name)
+print(reader_norkyst)
+# o.add_reader(reader_norkyst,variables=['x_sea_water_velocity', 'y_sea_water_velocity'])
+# o.add_reader(reader_norkyst,variables=['sea_floor_depth_below_sea_level','x_sea_water_velocity', 'y_sea_water_velocity'])
+o.add_reader(reader_norkyst)
+# ds = nc.Dataset(file_name) 
+# print(ds.variables.keys())
+# variable =ds.variables["h"]
+# print(variable[:])
+# o.add_readers_from_list('https://thredds.met.no/thredds/dodsC/sea/norkyst800m/1h/aggregate_be')
 
-
+reader_landmask = reader_global_landmask.Reader(
+                       extent=[2, 0, 180, 63])  # lonmin, latmin, lonmax, latmax
 
 # Adjusting some configuration
 o.set_config('drift:vertical_mixing', True)
@@ -27,7 +39,7 @@ o.set_config('drift:vertical_mixing', True)
 #o.set_config('vertical_mixing:diffusivitymodel','constant')  # include settling without vertical turbulent mixing
 o.set_config('vertical_mixing:diffusivitymodel','environment')  # include settling without vertical turbulent mixing
 # Vertical mixing requires fast time step
-o.set_config('vertical_mixing:timestep', 600.) # seconds
+# o.set_config('vertical_mixing:timestep', 600.) # seconds
 o.set_config('drift:horizontal_diffusivity', 10)
 
 #%%
@@ -78,16 +90,18 @@ o.list_configspec()
 
 # SEEDING
 
-td=datetime.today()
+td=datetime(2000,3,5,0,0,0)
 time = datetime(td.year, td.month, td.day, 0)
 
 #latseed= 61.2; lonseed= 4.3    # Sognesjen
 #latseed= 59.0;   lonseed= 10.75 # Hvaler/Koster
 #latseed= 57.5;   lonseed= 9.3 # Kattegat
-latseed= 60.0;   lonseed= 4.5 # Bergen (?)
+# latseed= 60.0;   lonseed= 4.5 # Bergen (?)
+latseed= 24.875;   lonseed= 122.375 # Pacific
 
 ntraj=5000
-iniz=np.random.rand(ntraj) * -10. # seeding the radionuclides in the upper 10m
+iniz=np.random.rand(ntraj) * -10. # seeding the radionuclides in the upper 10m 
+# np.random.rand() : Create an array of the given shape and populate it with random samples from a uniform distribution over [0, 1).
 
 o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,
                 time=time, 
@@ -100,7 +114,8 @@ o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,
 
 #%%
 # Running model
-o.run(steps=24*2, time_step=1800, time_step_output=3600)
+# o.run(steps=24*2, time_step=timedelta(hours=1), time_step_output=timedelta(hours=1))
+o.run(steps=15, time_step=timedelta(days=1), time_step_output=timedelta(days=2))
 
 
 #%%

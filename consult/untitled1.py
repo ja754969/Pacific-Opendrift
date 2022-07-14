@@ -17,15 +17,15 @@ reader_landmask = reader_global_landmask.Reader(
                        extent=[2, 59, 8, 63])
 
 reader_norkyst = reader_netCDF_CF_generic.Reader('https://thredds.met.no/thredds/dodsC/sea/norkyst800m/1h/aggregate_be')
-
+print(reader_norkyst)
 # path=("C:\\Users\\S607\\opendrift\\tests\\test_data\\16Nov2015_NorKyst_z_surface\\")
 # reader_norkyst = reader_netCDF_CF_generic.Reader(path+'norkyst800_subset_16Nov2015.nc')
 # reader_norkyst.plot()
 
 o.add_reader([reader_landmask, reader_norkyst])
-o.seed_elements(lon=4.85, lat=60, time=reader_norkyst.start_time, number=1000, radius=1000)
-
-o.run(duration=timedelta(hours=24))
+# o.seed_elements(lon=4.85, lat=60, time=reader_norkyst.start_time, number=1000, radius=1000)
+o.seed_elements(lon=4.3, lat=60, time=datetime(2017,7,11,18,0,0), number=1000, radius=1000)
+o.run(duration=timedelta(hours=24), outfile='tutorial_output.nc')
 o.plot(linecolor='z')
 
 #o.seed_elements(lon=4.3, lat=60, number=100, radius=1000,

@@ -1,8 +1,5 @@
 from opendrift.models.oceandrift import OceanDrift
-from opendrift.models.leeway import Leeway
-from opendrift.models.openoil import OpenOil
 from datetime import timedelta
-o = OpenOil(loglevel=0)
 from opendrift.readers import reader_netCDF_CF_generic
 reader_norkyst = reader_netCDF_CF_generic.Reader('./examples/opendrift/tests/test_data/16Nov2015_NorKyst_z_surface/norkyst800_subset_16Nov2015.nc')
 reader_norkyst = reader_netCDF_CF_generic.Reader(

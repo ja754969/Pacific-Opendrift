@@ -1,3 +1,8 @@
 *.temp
 # Large file : More than 50 MB (in the shell : "find * -size +50M | cat >> .gitignore")
 14year.nc
+consult/14year.nc
+pre_process/CMEMS_2000.mat
+pre_process/data/CMEMS_ADT-current_Jan_to_June_2000.nc
+pre_process/hycom_example_GLBv0.08_536_2010070212_t000.nc
+pre_process/my_cmems_2000.nc
