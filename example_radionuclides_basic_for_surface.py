@@ -44,7 +44,7 @@ o.set_config('radionuclide:transfer_setup','custom')
 td=datetime(2000,6,1,0,0,0)
 time = datetime(td.year, td.month, td.day, 0)
 latseed= 25.03;   lonseed= 122.24 # Pacific
-# latseed= 24.98;   lonseed= 120.73 # Pacific
+# latseed= 25.11;   lonseed= 120.73 # Pacific
 
 ntraj=1 # number of trajectory
 iniz=np.linspace(0.,0.,ntraj) # seeding the radionuclides in the upper 0m (surface) 

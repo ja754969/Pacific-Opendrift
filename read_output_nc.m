@@ -43,23 +43,27 @@ for i = 1:length(trajectory)
     stranded_lat = find(lat(i,:)>9.9*(10^35));
     stranded_lon = find(lon(i,:)>9.9*(10^35));
     if (isempty(stranded_lat)==0) & (isempty(stranded_lon)==0) & ...
-            (length(stranded_lat)==length(stranded_lon)) & (length(stranded_lat)>1)
+            (length(stranded_lat)==length(stranded_lon)) & (length(stranded_lat)>1) & ...
+            (length(trajectory)>1)
         lat(i,stranded_lat) = NaN;
         lon(i,stranded_lon) = NaN;
         stranded_marker_lat(i,1) = lat(i,stranded_lat(1)-1);
         stranded_marker_lon(i,1) = lon(i,stranded_lon(1)-1);
         stranded_trajectory = [stranded_trajectory i];
     elseif (isempty(stranded_lat)==0) & (isempty(stranded_lon)==0) & ...
-            (length(stranded_lat)==length(stranded_lon)) & (length(stranded_lat)==1)
+            (length(stranded_lat)==length(stranded_lon)) & (length(stranded_lat)==1) & ...
+            (length(trajectory)>1)
         lat(i,stranded_lat) = lat(i,stranded_lat-1);
         lon(i,stranded_lon) = lon(i,stranded_lon-1);
         stranded_marker_lat(i,1) = NaN;
         stranded_marker_lon(i,1) = NaN;
         not_stranded_trajectory = [not_stranded_trajectory i];
     else
-        stranded_marker_lat(i,1) = NaN;
-        stranded_marker_lon(i,1) = NaN;
-        not_stranded_trajectory = [not_stranded_trajectory i];
+        lat(i,stranded_lat) = NaN;
+        lon(i,stranded_lon) = NaN;
+        stranded_marker_lat(i,1) = lat(i,stranded_lat(1)-1);
+        stranded_marker_lon(i,1) = lon(i,stranded_lon(1)-1);
+        stranded_trajectory = [stranded_trajectory i];
     end
 end
 stranded_count = length(find(isnan(stranded_marker_lat)==0));
@@ -107,5 +111,6 @@ elseif (stranded_count ~= 0) & (not_stranded_count ~= 0)
         ['stranded (' num2str(stranded_count) ')'],...
         ['active (' num2str(not_stranded_count) ')']});
 else
-    lgd = legend([init],{['initial (' num2str(not_stranded_count+stranded_count) ')']});
+    lgd = legend([init stranded],{['initial (' num2str(not_stranded_count+stranded_count) ')'],...
+        ['stranded (' num2str(stranded_count) ')']});
 end
