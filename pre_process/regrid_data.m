@@ -13,6 +13,7 @@ function data_regrid = regrid_data(lat,lon,data,lat_to_be,lon_to_be)
     data_regrid = zeros(lat_to_be_length,lon_to_be_length);
     data_regrid_count = zeros(lat_to_be_length,lon_to_be_length);
     for i = 1:lat_to_be_length
+        fprintf([char(datetime('now')) '\n']);
         for j = 1:lon_to_be_length
             select_ind = find(lat>=lat_to_be(i,j)-lat_grid/2 & ...
                 lat<lat_to_be(i,j)+lat_grid/2 & ...

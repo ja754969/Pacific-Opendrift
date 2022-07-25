@@ -1,39 +1,67 @@
 clear;clc;close all
-load('CMEMS_2000.mat')
 %%
-n=datenum(2000,01,01,0,0,0):1:datenum(2000,06,30,0,0,0);
-n2=(datenum(2000,01,01,0,0,0):1:datenum(2000,06,30,0,0,0))';
-
-timex=(24.*(n-datenum(1990,01,01)));
-time=(24.*(n2-datenum(1990,01,01)));
-U_2=U_1(:,:,find(timex==time(1)):find(timex==time(1))+length(time)-1);
-V_2=V_1(:,:,find(timex==time(1)):find(timex==time(1))+length(time)-1);
+timex=datetime(2001,01,01):datetime(2001,06,30);
+% timex=datetime(2000,07,01):datetime(2000,12,31);
+%%
+if (year(timex(end))-year(timex(1))==0) & month(timex(1))==1 & day(timex(1))==1 & ...
+        month(timex(end))==6 & day(timex(end))==30
+    y = num2str(year(timex(1)));
+    [U_1,V_1,LAT,LON,time] = nc_to_mat(['./data/CMEMS_ADT_u-current_Jan_to_Jun_' y '.nc'],...
+        ['./data/CMEMS_ADT_v-current_Jan_to_Jun_' y '.nc'],...
+        ['CMEMS_' y '_1.mat']);
+    file_name = ['my_cmems_' y '_1.nc'];
+elseif (year(timex(end))-year(timex(1))==0) & month(timex(1))==7 & day(timex(1))==1 & ...
+        month(timex(end))==12 & day(timex(end))==31
+    y = num2str(year(timex(1)));
+    [U_1,V_1,LAT,LON,time] = nc_to_mat(['./data/CMEMS_ADT_u-current_Jul_to_Dec_' y '.nc'],...
+        ['./data/CMEMS_ADT_v-current_Jul_to_Dec_' y '.nc'],...
+        ['CMEMS_' y '_2.mat']);
+    file_name = ['my_cmems_' y '_2.nc'];
+end
+%%
+time = hours(timex - datetime(1990,01,01));
+%%
+% load('CMEMS_2000.mat')
+U_2=U_1(:,:,:);
+V_2=V_1(:,:,:);
+%%
 for i=1:length(time)
     U_3(:,:,i)=squeeze(U_2(:,:,i))';
     V_3(:,:,i)=squeeze(V_2(:,:,i))';
 end
-% time=(24.*(n2-datenum(1990,01,01)));
-datestr(time/24+datenum(1990,01,01));
 %%
-% topo = zeros(size(U_3,1),size(U_3,2))-100;
-[ELEV_topo,LON_topo,LAT_topo] = m_etopo2([LON(1) LON(end) LAT(1) LAT(end)]);
-ELEV_topo(ELEV_topo>0) = 0;
-ELEV_topo = -ELEV_topo;
-%%
-[LON_grid,LAT_grid] = meshgrid(LON,LAT);
-topo = regrid_data(LAT_topo,LON_topo,ELEV_topo,LAT_grid,LON_grid);
+% % topo = zeros(size(U_3,1),size(U_3,2))-100;
+% [ELEV_topo,LON_topo,LAT_topo] = m_etopo2([LON(1) LON(end) LAT(1) LAT(end)]);
+% ELEV_topo(ELEV_topo>0) = 0;
+% ELEV_topo = -ELEV_topo;
+% %%
+% [LON_grid,LAT_grid] = meshgrid(LON,LAT);
+% topo = regrid_data(LAT_topo,LON_topo,ELEV_topo,LAT_grid,LON_grid);
+load('./data/topo_for_CMEMS.mat');
+LON_ind = intersect(find(LON_CMEMS>=min(LON)),find(LON_CMEMS<=max(LON)));
+LAT_ind = intersect(find(LAT_CMEMS>=min(LAT)),find(LAT_CMEMS<=max(LAT)));
+topo = topo(LAT_ind,LON_ind);
 %%
 h = permute(topo,[2 1]);
 %%
 dim_lon = length(LON);
 dim_lat = length(LAT);
 dim_time = length(time);
+%% Longitude for HYCOM format
+lon_ind_west = find(LON<180);
+lon_ind_east = find(LON>=180);
+if isempty(lon_ind_east)==0
+    LON_for_hycom = [(LON(lon_ind_east)-360);LON(lon_ind_west)];
+    h_for_hycom = [h(lon_ind_east,:);h(lon_ind_west,:)];
+else
+    LON_for_hycom = LON;
+    h_for_hycom = h;
+end
 %%
-file_name = 'my_cmems_2000.nc';
-delete(file_name);
+delete(['./processed_data/' file_name]);
 
 % Create a netCDF file.
-ncid = netcdf.create(file_name,'NC_WRITE');
+ncid = netcdf.create(['./processed_data/' file_name],'NC_WRITE');
 
 % Define a dimension in the file.
 dimid_lon = netcdf.defDim(ncid,'lon',dim_lon);
@@ -53,12 +81,12 @@ varid_h = netcdf.defVar(ncid,'h','double',[dimid_lon dimid_lat]);
 netcdf.endDef(ncid);
 
 % Write data to variable.
-netcdf.putVar(ncid,varid_lon,LON);
+netcdf.putVar(ncid,varid_lon,LON_for_hycom);
 netcdf.putVar(ncid,varid_lat,LAT);
 netcdf.putVar(ncid,varid_time,time);
 netcdf.putVar(ncid,varid_water_u,U_3);
 netcdf.putVar(ncid,varid_water_v,V_3);
-netcdf.putVar(ncid,varid_h,h);
+netcdf.putVar(ncid,varid_h,h_for_hycom);
 
 
 % Re-enter define mode.
@@ -76,11 +104,11 @@ netcdf.putAtt(ncid,varid_time,'time_origin','1990-01-01 00:00:00');
 netcdf.putAtt(ncid,varid_water_u,'standard_name','eastward_sea_water_velocity');
 netcdf.putAtt(ncid,varid_water_u,'units','meter second-1');
 netcdf.putAtt(ncid,varid_water_u,'missing_value',-30000);
-netcdf.putAtt(ncid,varid_water_u,'scale_factor',0.001);
+netcdf.putAtt(ncid,varid_water_u,'scale_factor',1);
 netcdf.putAtt(ncid,varid_water_v,'standard_name','northward_sea_water_velocity');
 netcdf.putAtt(ncid,varid_water_v,'units','meter second-1');
 netcdf.putAtt(ncid,varid_water_v,'missing_value',-30000);
-netcdf.putAtt(ncid,varid_water_v,'scale_factor',0.001);
+netcdf.putAtt(ncid,varid_water_v,'scale_factor',1);
 netcdf.putAtt(ncid,varid_h,'standard_name','sea_floor_depth_below_sea_level');
 netcdf.putAtt(ncid,varid_h,'grid_mapping','projection_stere');
 netcdf.putAtt(ncid,varid_h,'grid','grid');

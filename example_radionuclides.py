@@ -20,18 +20,21 @@ o = RadionuclideDrift(loglevel=20, seed=20)  # Set loglevel to 0 for debug infor
 
 file_name = 'E:/git-repos/OpenDrift/pre_process/my_cmems_2000.nc'
 reader_norkyst = reader_netCDF_CF_generic.Reader(file_name)
-print(reader_norkyst)
+pprint(reader_norkyst)
+reader_landmask = reader_global_landmask.Reader(
+                       extent=[-180, 2, 180, 63])  # lonmin, latmin, lonmax, latmax
+print(reader_landmask)
 # o.add_reader(reader_norkyst,variables=['x_sea_water_velocity', 'y_sea_water_velocity'])
-# o.add_reader(reader_norkyst,variables=['sea_floor_depth_below_sea_level','x_sea_water_velocity', 'y_sea_water_velocity'])
-o.add_reader(reader_norkyst)
+o.add_reader(reader_norkyst,variables=['sea_floor_depth_below_sea_level','x_sea_water_velocity', 'y_sea_water_velocity'])
+# o.add_reader(reader_norkyst)
+o.add_reader(reader_landmask, variables='land_binary_mask')
 # ds = nc.Dataset(file_name) 
 # print(ds.variables.keys())
 # variable =ds.variables["h"]
 # print(variable[:])
 # o.add_readers_from_list('https://thredds.met.no/thredds/dodsC/sea/norkyst800m/1h/aggregate_be')
 
-reader_landmask = reader_global_landmask.Reader(
-                       extent=[2, 0, 180, 63])  # lonmin, latmin, lonmax, latmax
+
 
 # Adjusting some configuration
 o.set_config('drift:vertical_mixing', True)
@@ -39,7 +42,7 @@ o.set_config('drift:vertical_mixing', True)
 #o.set_config('vertical_mixing:diffusivitymodel','constant')  # include settling without vertical turbulent mixing
 o.set_config('vertical_mixing:diffusivitymodel','environment')  # include settling without vertical turbulent mixing
 # Vertical mixing requires fast time step
-# o.set_config('vertical_mixing:timestep', 600.) # seconds
+o.set_config('vertical_mixing:timestep', 600.) # seconds
 o.set_config('drift:horizontal_diffusivity', 10)
 
 #%%
@@ -90,14 +93,14 @@ o.list_configspec()
 
 # SEEDING
 
-td=datetime(2000,3,5,0,0,0)
+td=datetime(2000,1,1,0,0,0)
 time = datetime(td.year, td.month, td.day, 0)
 
 #latseed= 61.2; lonseed= 4.3    # Sognesjen
 #latseed= 59.0;   lonseed= 10.75 # Hvaler/Koster
 #latseed= 57.5;   lonseed= 9.3 # Kattegat
 # latseed= 60.0;   lonseed= 4.5 # Bergen (?)
-latseed= 24.875;   lonseed= 122.375 # Pacific
+latseed= 35;   lonseed= 179 # Pacific
 
 ntraj=5000
 iniz=np.random.rand(ntraj) * -10. # seeding the radionuclides in the upper 10m 
@@ -115,8 +118,12 @@ o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,
 #%%
 # Running model
 # o.run(steps=24*2, time_step=timedelta(hours=1), time_step_output=timedelta(hours=1))
-o.run(steps=15, time_step=timedelta(days=1), time_step_output=timedelta(days=2))
-
+# o.run(time_step=timedelta(days=1),
+#        duration=timedelta(days=50),outfile='test.nc')
+# o.run(steps=140, time_step=timedelta(days=1), time_step_output=timedelta(days=1))
+o.run(steps=180, time_step=timedelta(days=1), time_step_output=timedelta(days=1),outfile='example_radionuclides_output.nc')
+# o.run(duration=timedelta(days=1),steps=50, time_step=timedelta(days=1), time_step_output=timedelta(days=1))
+# 
 
 #%%
 # Print and plot results
@@ -127,20 +134,27 @@ for isp,sp in enumerate(o.name_species):
 
 print('Number of transformations:')
 for isp in range(o.nspecies):
-    print('{}'.format(['{:>9}'.format(np.int(item)) for item in o.ntransformations[isp,:]]) )
+    print('{}'.format(['{:>9}'.format(np.int(item)) for item in o.ntransformations[isp,:]]))
 
-o.animation(color='specie',
-            vmin=0,vmax=o.nspecies-1,
-            colorbar=False,
-            legend=[o.specie_num2name(i) for i in range(o.nspecies)],
-            fast = True
-            )
+# o.animation(color='specie',
+#             vmin=0,vmax=o.nspecies-1,
+#             colorbar=False,
+#             legend=[o.specie_num2name(i) for i in range(o.nspecies)],
+#             fast = True
+#             )
+o.animation(background=['x_sea_water_velocity', 'y_sea_water_velocity'],filename='example_radionuclides_animation.mp4')
 #%%
 # .. image:: /gallery/animations/example_radionuclides_0.gif
 
 o.plot_vertical_distribution()
 #o.plot_property('specie')
-o.animation_profile(color='specie',
+# o.animation_profile(color='specie',
+#             vmin=0,vmax=o.nspecies-1,
+#             legend=[o.specie_num2name(i) for i in range(o.nspecies)],
+#             legend_loc =3,
+# #            markersize=10
+#             )
+o.animation_profile(color='z',
             vmin=0,vmax=o.nspecies-1,
             legend=[o.specie_num2name(i) for i in range(o.nspecies)],
             legend_loc =3,
@@ -149,9 +163,9 @@ o.animation_profile(color='specie',
 #%%
 # .. image:: /gallery/animations/example_radionuclides_1.gif
 
-o.plot(linecolor='specie',vmin=0,vmax=o.nspecies-1,fast=True,)
-
-
+# o.plot(linecolor='specie',vmin=0,vmax=o.nspecies-1,fast=True,)
+o.plot(linecolor='z',background=['x_sea_water_velocity', 'y_sea_water_velocity'],filename = 'example_radionuclides_animation.jpg')
+# o.plot(linecolor='z')
 
 # Postprocessing: write to concentration netcdf file
 o.conc_lat   = reader_norkyst.lat
