@@ -58,12 +58,10 @@ for i = 1:length(trajectory)
         stranded_marker_lat(i,1) = NaN;
         stranded_marker_lon(i,1) = NaN;
         not_stranded_trajectory = [not_stranded_trajectory i];
-    else
-        lat(i,stranded_lat) = NaN;
-        lon(i,stranded_lon) = NaN;
-        stranded_marker_lat(i,1) = lat(i,stranded_lat(1)-1);
-        stranded_marker_lon(i,1) = lon(i,stranded_lon(1)-1);
-        stranded_trajectory = [stranded_trajectory i];
+    elseif (isempty(stranded_lat)==1) & (isempty(stranded_lon)==1)
+        stranded_marker_lat(i,1) = NaN;
+        stranded_marker_lon(i,1) = NaN;
+        not_stranded_trajectory = [not_stranded_trajectory i];
     end
 end
 stranded_count = length(find(isnan(stranded_marker_lat)==0));
@@ -82,24 +80,23 @@ fig.WindowState = 'maximized';
 fig
 m_proj('miller','lon',[LON_lim(1) LON_lim(end)],'lat',[LAT_lim(1) LAT_lim(end)]);
 m_gshhs_h('patch',[0 0 0]);
-hold on;
 for ind = not_stranded_trajectory
-%     ind = not_stranded_trajectory(i);
+    hold on;
     init = m_plot(lon(ind,1),lat(ind,1),'Marker','.','MarkerSize',15,'Color','g');
     hold on;
     m_plot(lon(ind,:),lat(ind,:),'-b');
     hold on;
     active = m_plot(lon(ind,end),lat(ind,end),'Marker','.','MarkerSize',15,'Color','b');
-    hold on
+    hold on;
 end
 for ind = stranded_trajectory
-%     ind = stranded_trajectory(i);
+    hold on;
     init = m_plot(lon(ind,1),lat(ind,1),'Marker','.','MarkerSize',15,'Color','g');
     hold on;
     m_plot(lon(ind,:),lat(ind,:),'-r');
     hold on;
     stranded = m_plot(stranded_marker_lon(ind),stranded_marker_lat(ind),'Marker','.','MarkerSize',15,'Color','r');
-    hold on
+    hold on;
 end
 m_grid('tickdir','out','FontSize',25,'FontWeight','bold','LineWidth',3)
 title([char(time(1)) ' - ' char(time(end))],'FontSize',15)

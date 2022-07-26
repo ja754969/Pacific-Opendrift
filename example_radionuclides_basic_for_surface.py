@@ -16,17 +16,17 @@ from pprint import pprint
 o = RadionuclideDrift(loglevel=20, seed=20)  # Set loglevel to 0 for debug information
 
 # Read Files
-# file_name = 'E:/git-repos/OpenDrift/pre_process/processed_data/my_cmems_2000_1.nc'
+# file_name = './pre_process/processed_data/my_cmems_2000_1.nc'
 # reader_ncfile = reader_netCDF_CF_generic.Reader(file_name)
 # pprint(reader_ncfile)
 # o.add_reader([reader_ncfile],variables=['sea_floor_depth_below_sea_level','x_sea_water_velocity', 'y_sea_water_velocity'])
-file_name_1 = 'E:/git-repos/OpenDrift/pre_process/processed_data/my_cmems_2000_1.nc'
+file_name_1 = './pre_process/processed_data/my_cmems_2000_1.nc'
 reader_ncfile_1 = reader_netCDF_CF_generic.Reader(file_name_1)
 # pprint(reader_ncfile_2)
-file_name_2 = 'E:/git-repos/OpenDrift/pre_process/processed_data/my_cmems_2000_2.nc'
+file_name_2 = './pre_process/processed_data/my_cmems_2000_2.nc'
 reader_ncfile_2 = reader_netCDF_CF_generic.Reader(file_name_2)
 # pprint(reader_ncfile_2)
-file_name_3 = 'E:/git-repos/OpenDrift/pre_process/processed_data/my_cmems_2001_1.nc'
+file_name_3 = './pre_process/processed_data/my_cmems_2001_1.nc'
 reader_ncfile_3 = reader_netCDF_CF_generic.Reader(file_name_3)
 # pprint(reader_ncfile_3)
 o.add_reader([reader_ncfile_1,reader_ncfile_2,reader_ncfile_3],variables=['sea_floor_depth_below_sea_level','x_sea_water_velocity', 'y_sea_water_velocity'])
