@@ -1,21 +1,22 @@
 clear;clc;close all
 %%
-timex=datetime(2001,01,01):datetime(2001,06,30);
-% timex=datetime(2000,07,01):datetime(2000,12,31);
+% timex=datetime(2021,01,01):datetime(2021,06,30);
+timex=datetime(2020,07,01):datetime(2020,12,31);
+%%
+data_folder=['D:/Data/origin/' ...
+        'cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.25deg_P1D/half-year_uv/'];
 %%
 if (year(timex(end))-year(timex(1))==0) & month(timex(1))==1 & day(timex(1))==1 & ...
         month(timex(end))==6 & day(timex(end))==30
     y = num2str(year(timex(1)));
-    [U_1,V_1,LAT,LON,time] = nc_to_mat(['./data/CMEMS_ADT_u-current_Jan_to_Jun_' y '.nc'],...
-        ['./data/CMEMS_ADT_v-current_Jan_to_Jun_' y '.nc'],...
-        ['CMEMS_' y '_1.mat']);
+    [U_1,V_1,LAT,LON,time] = nc_to_mat([data_folder 'CMEMS_ADT_u-current_Jan_to_Jun_' y '.nc'],...
+        [data_folder 'CMEMS_ADT_v-current_Jan_to_Jun_' y '.nc'],['CMEMS_' y '_1.mat']);
     file_name = ['my_cmems_' y '_1.nc'];
 elseif (year(timex(end))-year(timex(1))==0) & month(timex(1))==7 & day(timex(1))==1 & ...
         month(timex(end))==12 & day(timex(end))==31
     y = num2str(year(timex(1)));
-    [U_1,V_1,LAT,LON,time] = nc_to_mat(['./data/CMEMS_ADT_u-current_Jul_to_Dec_' y '.nc'],...
-        ['./data/CMEMS_ADT_v-current_Jul_to_Dec_' y '.nc'],...
-        ['CMEMS_' y '_2.mat']);
+    [U_1,V_1,LAT,LON,time] = nc_to_mat([data_folder 'CMEMS_ADT_u-current_Jul_to_Dec_' y '.nc'],...
+        [data_folder 'CMEMS_ADT_v-current_Jul_to_Dec_' y '.nc'],['CMEMS_' y '_2.mat']);
     file_name = ['my_cmems_' y '_2.nc'];
 end
 %%

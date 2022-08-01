@@ -42,22 +42,43 @@ o.add_reader(reader_landmask, variables='land_binary_mask')
 # Adjusting some configuration
 # o.set_config()
 o.set_config('radionuclide:transfer_setup','custom')
+# o.set_config('radionuclide:species:LMM', False)
+o.set_config('environment:constant:ocean_mixed_layer_thickness',50)
+# o.set_config('radionuclide:particle_diameter',0.0005)
+# o.set_config('radionuclide:species:Polymer', True)
+# o.set_config('radionuclide:particle_diameter',5.e-5)  # m
+# o.set_config('radionuclide:sediment:resuspension_depth',0)
+# o.set_config('radionuclide:sediment:resuspension_depth_uncert',0.1)
+# o.set_config('radionuclide:sediment:resuspension_critvel',0.15)
 # o.list_configspec()
 
 # SEEDING
-td=datetime(2001,8,13,0,0,0)
+td=datetime(2000,6,1,0,0,0)   
 time = datetime(td.year, td.month, td.day, 0)
-# latseed= 25.03;   lonseed= 122.24 # Pacific
-latseed= 25.11;   lonseed= 120.73 # Pacific
+latseed= 25.03;   lonseed= 122.24 # Pacific
+# latseed= 25.11;   lonseed= 120.73 # Pacific
 # latseed= 24.28;   lonseed= 141.48 # Fukutoku-Okanoba volcano
 
-ntraj=1 # number of trajectory
+ntraj=1000 # number of trajectory
 iniz=np.linspace(0.,0.,ntraj) # seeding the radionuclides in the upper 0m (surface) 
+terminal_velocity = 0 # Neutral particles (No Rising, no sinking)
 
-o.seed_elements(lonseed, latseed, z=iniz, radius=0,number=ntraj,time=time)
+# o.seed_elements(lonseed, latseed, z=iniz, radius=0,number=ntraj,time=time)
+o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,time=time,density=500,terminal_velocity=terminal_velocity,origin_marker=1,diameter=0.0005)
+# o.seed_elements(lonseed, latseed, z=..., radius=...,number=...,time=...,density=..., neutral_buoyancy_salinity=...,specie =...,wind_drift_factor=...,
+# current_drift_factor=...,terminal_velocity=...,origin_marker=...)
+# seed:origin_marker                  [0] float min: None, max: None [None] An integer kept cons...  
+# seed:diameter                       [0.0] float min: None, max: None [m] Seeding value of dia...  
+# seed:neutral_buoyancy_salinity      [31.25] float min: None, max: None [[]] Seeding value of neu...  
+# seed:density                        [2650.0] float min: None, max: None [kg/m^3] Seeding value of den...  
+# seed:specie                         [0] float min: None, max: None [] Seeding value of spe...  
+
+
 #%%
 # Running model (save to nc file)
-o.run(steps=60, time_step=timedelta(days=1), time_step_output=timedelta(days=1),outfile='example_radionuclides_output.nc')
+o.list_configspec()
+# o.run(steps=60, time_step=timedelta(days=1), time_step_output=timedelta(days=1))
+o.run(steps=180, time_step=timedelta(days=1), time_step_output=timedelta(days=1),outfile='example_radionuclides_output.nc')
 # 
 #%%
 # Running model (save to image files)

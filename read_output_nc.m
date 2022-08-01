@@ -1,6 +1,7 @@
 clear;clc;close all;
 %% Read the nc file outputted from "example_radionuclides_basic_for_surface.py"
 filename = 'example_radionuclides_output.nc';
+% filename = 'simulation_radionuclides_Fukutoku-Okanoba_output.nc';
 % filename = './consult/example_radionuclides_output.nc';
 ncdisp(filename);
 %% Read the variables from the nc file
@@ -43,21 +44,13 @@ for i = 1:length(trajectory)
     stranded_lat = find(lat(i,:)>9.9*(10^35));
     stranded_lon = find(lon(i,:)>9.9*(10^35));
     if (isempty(stranded_lat)==0) & (isempty(stranded_lon)==0) & ...
-            (length(stranded_lat)==length(stranded_lon)) & (length(stranded_lat)>1) & ...
-            (length(trajectory)>1)
+            (length(stranded_lat)==length(stranded_lon)) & (length(stranded_lat)>=1) & ...
+            (length(trajectory)>=1)
         lat(i,stranded_lat) = NaN;
         lon(i,stranded_lon) = NaN;
         stranded_marker_lat(i,1) = lat(i,stranded_lat(1)-1);
         stranded_marker_lon(i,1) = lon(i,stranded_lon(1)-1);
         stranded_trajectory = [stranded_trajectory i];
-    elseif (isempty(stranded_lat)==0) & (isempty(stranded_lon)==0) & ...
-            (length(stranded_lat)==length(stranded_lon)) & (length(stranded_lat)==1) & ...
-            (length(trajectory)>1)
-        lat(i,stranded_lat) = lat(i,stranded_lat-1);
-        lon(i,stranded_lon) = lon(i,stranded_lon-1);
-        stranded_marker_lat(i,1) = NaN;
-        stranded_marker_lon(i,1) = NaN;
-        not_stranded_trajectory = [not_stranded_trajectory i];
     elseif (isempty(stranded_lat)==1) & (isempty(stranded_lon)==1)
         stranded_marker_lat(i,1) = NaN;
         stranded_marker_lon(i,1) = NaN;
@@ -70,7 +63,7 @@ not_stranded_count = length(trajectory)-stranded_count;
 LAT_lim = [floor(min(lat(:)))-5 ceil(max(lat(:)))+5];
 LON_lim = [floor(min(lon(:)))-5 ceil(max(lon(:)))+5];
 % LAT_lim = [0 60];
-% LON_lim = [100 180];
+% LON_lim = [100 190];
 %% Plotting data for checks
 fig = figure;
 fig.PaperUnits = 'centimeters';
@@ -78,7 +71,7 @@ fig.PaperSize = [29.7 21]; % A4 papersize (horizontal,21-by-29.7 cm,[width heigh
 fig.PaperType = '<custom>';
 fig.WindowState = 'maximized';
 fig
-m_proj('miller','lon',[LON_lim(1) LON_lim(end)],'lat',[LAT_lim(1) LAT_lim(end)]);
+m_proj('Mercator','lon',[LON_lim(1) LON_lim(end)],'lat',[LAT_lim(1) LAT_lim(end)]);
 m_gshhs_h('patch',[0 0 0]);
 for ind = not_stranded_trajectory
     hold on;

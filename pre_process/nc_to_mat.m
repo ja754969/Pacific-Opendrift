@@ -1,7 +1,7 @@
 function [U_1,V_1,LAT,LON,time] = nc_to_mat(input_file_for_u,input_file_for_v,output_file)
     % clear;clc;close all
     %%
-    % input_file = './data/CMEMS_ADT-current_Jan_to_June_2000.nc';
+    % input_file = '.D:/Data/cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.25deg_P1D/CMEMS_ADT-current_Jan_to_June_2000.nc';
     ncdisp(input_file_for_u)
     ncdisp(input_file_for_v)
     %%
