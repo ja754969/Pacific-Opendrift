@@ -63,8 +63,8 @@ ntraj=1000 # number of trajectory
 iniz=np.linspace(0.,0.,ntraj) # seeding the radionuclides in the upper 0m (surface) 
 terminal_velocity = 0 # Neutral particles (No Rising, no sinking)
 
-# o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,time=time)
-o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,time=time,density=0.01,terminal_velocity=terminal_velocity,diameter=0.5,neutral_buoyancy_salinity=36.1,current_drift_factor=0.9)
+o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,time=time)
+# o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,time=time,density=0.01,terminal_velocity=terminal_velocity,diameter=0.5,neutral_buoyancy_salinity=36.1,current_drift_factor=0.9)
 # o.seed_elements(lonseed, latseed, z=..., radius=...,number=...,time=...,density=..., neutral_buoyancy_salinity=...,specie =...,wind_drift_factor=...,
 # current_drift_factor=...,terminal_velocity=...,origin_marker=...)
 # seed:origin_marker                  [0] float min: None, max: None [None] An integer kept cons...  

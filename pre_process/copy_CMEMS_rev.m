@@ -1,6 +1,6 @@
 clear;clc;close all
 %%
-% timex=datetime(2021,01,01):datetime(2021,06,30);
+% timex=datetime(2020,01,01):datetime(2020,06,30);
 timex=datetime(2020,07,01):datetime(2020,12,31);
 %%
 data_folder=['D:/Data/origin/' ...
@@ -88,10 +88,10 @@ netcdf.reDef(ncid);
 % Create an attribute associated with the variable.
 netcdf.putAtt(ncid,varid_lon,'standard_name','longitude');
 netcdf.putAtt(ncid,varid_lon,'units','degree_east');
-netcdf.putAtt(ncid,varid_lon,'axis','Y');
+netcdf.putAtt(ncid,varid_lon,'axis','X');
 netcdf.putAtt(ncid,varid_lat,'standard_name','latitude');
 netcdf.putAtt(ncid,varid_lat,'units','degree_north');
-netcdf.putAtt(ncid,varid_lat,'axis','X');
+netcdf.putAtt(ncid,varid_lat,'axis','Y');
 netcdf.putAtt(ncid,varid_time,'units','hours since 1990-01-01 00:00:00');
 netcdf.putAtt(ncid,varid_time,'time_origin','1990-01-01 00:00:00');
 netcdf.putAtt(ncid,varid_water_u,'standard_name','eastward_sea_water_velocity');
