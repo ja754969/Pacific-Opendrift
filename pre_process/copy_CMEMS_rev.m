@@ -22,7 +22,6 @@ end
 %%
 time = hours(timex - datetime(1990,01,01));
 %%
-% load('CMEMS_2000.mat')
 U_2=U_1(:,:,:);
 V_2=V_1(:,:,:);
 %%
@@ -31,13 +30,6 @@ for i=1:length(time)
     V_3(:,:,i)=squeeze(V_2(:,:,i))';
 end
 %%
-% % topo = zeros(size(U_3,1),size(U_3,2))-100;
-% [ELEV_topo,LON_topo,LAT_topo] = m_etopo2([LON(1) LON(end) LAT(1) LAT(end)]);
-% ELEV_topo(ELEV_topo>0) = 0;
-% ELEV_topo = -ELEV_topo;
-% %%
-% [LON_grid,LAT_grid] = meshgrid(LON,LAT);
-% topo = regrid_data(LAT_topo,LON_topo,ELEV_topo,LAT_grid,LON_grid);
 load('./data/topo_for_CMEMS.mat');
 LON_ind = intersect(find(LON_CMEMS>=min(LON)),find(LON_CMEMS<=max(LON)));
 LAT_ind = intersect(find(LAT_CMEMS>=min(LAT)),find(LAT_CMEMS<=max(LAT)));
@@ -95,11 +87,11 @@ netcdf.reDef(ncid);
 
 % Create an attribute associated with the variable.
 netcdf.putAtt(ncid,varid_lon,'standard_name','longitude');
-netcdf.putAtt(ncid,varid_lon,'units','degree_north');
-netcdf.putAtt(ncid,varid_lon,'axis','X');
+netcdf.putAtt(ncid,varid_lon,'units','degree_east');
+netcdf.putAtt(ncid,varid_lon,'axis','Y');
 netcdf.putAtt(ncid,varid_lat,'standard_name','latitude');
-netcdf.putAtt(ncid,varid_lat,'units','degree_east');
-netcdf.putAtt(ncid,varid_lat,'axis','Y');
+netcdf.putAtt(ncid,varid_lat,'units','degree_north');
+netcdf.putAtt(ncid,varid_lat,'axis','X');
 netcdf.putAtt(ncid,varid_time,'units','hours since 1990-01-01 00:00:00');
 netcdf.putAtt(ncid,varid_time,'time_origin','1990-01-01 00:00:00');
 netcdf.putAtt(ncid,varid_water_u,'standard_name','eastward_sea_water_velocity');

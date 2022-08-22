@@ -57,7 +57,7 @@ iniz=np.linspace(0.,0.,ntraj) # seeding the radionuclides in the upper 0m (surfa
 o.seed_elements(lonseed, latseed, z=iniz, radius=0,number=ntraj,time=time)
 #%%
 # Running model (save to nc file)
-o.run(steps=60, time_step=timedelta(days=1), time_step_output=timedelta(days=1),outfile='example_radionuclides_output.nc')
+o.run(steps=60, time_step=timedelta(days=1), time_step_output=timedelta(days=1), outfile='example_radionuclides_output.nc')
 # 
 #%%
 # Running model (save to image files)

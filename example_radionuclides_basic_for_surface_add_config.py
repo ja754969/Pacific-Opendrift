@@ -43,7 +43,7 @@ o.add_reader(reader_landmask, variables='land_binary_mask')
 # o.set_config()
 o.set_config('radionuclide:transfer_setup','custom')
 # o.set_config('radionuclide:species:LMM', False)
-o.set_config('environment:constant:ocean_mixed_layer_thickness',50)
+# o.set_config('environment:constant:ocean_mixed_layer_thickness',50)
 # o.set_config('radionuclide:particle_diameter',0.0005)
 # o.set_config('radionuclide:species:Polymer', True)
 # o.set_config('radionuclide:particle_diameter',5.e-5)  # m
@@ -63,8 +63,8 @@ ntraj=1000 # number of trajectory
 iniz=np.linspace(0.,0.,ntraj) # seeding the radionuclides in the upper 0m (surface) 
 terminal_velocity = 0 # Neutral particles (No Rising, no sinking)
 
-# o.seed_elements(lonseed, latseed, z=iniz, radius=0,number=ntraj,time=time)
-o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,time=time,density=500,terminal_velocity=terminal_velocity,origin_marker=1,diameter=0.0005)
+# o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,time=time)
+o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,time=time,density=0.01,terminal_velocity=terminal_velocity,diameter=0.5,neutral_buoyancy_salinity=36.1,current_drift_factor=0.9)
 # o.seed_elements(lonseed, latseed, z=..., radius=...,number=...,time=...,density=..., neutral_buoyancy_salinity=...,specie =...,wind_drift_factor=...,
 # current_drift_factor=...,terminal_velocity=...,origin_marker=...)
 # seed:origin_marker                  [0] float min: None, max: None [None] An integer kept cons...  
