@@ -16,7 +16,7 @@ from pprint import pprint
 o = RadionuclideDrift(loglevel=20, seed=20)  # Set loglevel to 0 for debug information
 
 # Read Files
-file_name = './pre_process/processed_data/my_cmems_2020_2.nc'
+file_name = 'D:/Data/used_by_projects/Pacific-Opendrift/CMEMS/my_cmems_2000_2.nc'
 reader_ncfile = reader_netCDF_CF_generic.Reader(file_name)
 pprint(reader_ncfile)
 o.add_reader([reader_ncfile],variables=['sea_floor_depth_below_sea_level','x_sea_water_velocity', 'y_sea_water_velocity'])
@@ -45,7 +45,7 @@ o.set_config('radionuclide:transfer_setup','custom')
 # o.list_configspec()
 
 # SEEDING
-td=datetime(2020,8,13,0,0,0)
+td=datetime(2000,8,13,0,0,0)
 time = datetime(td.year, td.month, td.day, 0)
 latseed= 25.03;   lonseed= 122.24 # Pacific
 # latseed= 25.11;   lonseed= 120.73 # Pacific
@@ -57,7 +57,7 @@ iniz=np.linspace(0.,0.,ntraj) # seeding the radionuclides in the upper 0m (surfa
 o.seed_elements(lonseed, latseed, z=iniz, radius=0,number=ntraj,time=time)
 #%%
 # Running model (save to nc file)
-o.run(steps=60, time_step=timedelta(days=1), time_step_output=timedelta(days=1), outfile='example_radionuclides_output.nc')
+o.run(steps=60, time_step=timedelta(days=1), time_step_output=timedelta(days=1), outfile='./nc_output/example_radionuclides_output.nc')
 
 #%%
 # Running model (save to image files)

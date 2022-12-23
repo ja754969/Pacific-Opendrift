@@ -63,7 +63,7 @@ ntraj=1000 # number of trajectory
 iniz=np.linspace(0.,0.,ntraj) # seeding the radionuclides in the upper 0m (surface) 
 terminal_velocity = 0 # Neutral particles (No Rising, no sinking)
 
-o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,time=time)
+o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,time=time,density=500)
 # o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,time=time,density=0.01,terminal_velocity=terminal_velocity,diameter=0.5,neutral_buoyancy_salinity=36.1,current_drift_factor=0.9)
 # o.seed_elements(lonseed, latseed, z=..., radius=...,number=...,time=...,density=..., neutral_buoyancy_salinity=...,specie =...,wind_drift_factor=...,
 # current_drift_factor=...,terminal_velocity=...,origin_marker=...)
@@ -78,7 +78,7 @@ o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,time=time)
 # Running model (save to nc file)
 o.list_configspec()
 # o.run(steps=60, time_step=timedelta(days=1), time_step_output=timedelta(days=1))
-o.run(steps=180, time_step=timedelta(days=1), time_step_output=timedelta(days=1),outfile='example_radionuclides_output.nc')
+o.run(steps=180, time_step=timedelta(days=1), time_step_output=timedelta(days=1),outfile='./nc_output/example_radionuclides_add_config_output.nc')
 # 
 #%%
 # Running model (save to image files)

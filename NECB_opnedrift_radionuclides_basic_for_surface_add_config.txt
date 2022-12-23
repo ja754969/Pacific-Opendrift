@@ -1,0 +1,9 @@
+Commands of terminal
+
+# For MEI301_skyuser
+
+conda activate Opendrift
+
+cd /d E:/git-repos/OpenDrift
+
+python NECB_opnedrift_radionuclides_basic_for_surface_add_config.py

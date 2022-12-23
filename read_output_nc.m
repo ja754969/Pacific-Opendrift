@@ -1,6 +1,6 @@
 clear;clc;close all;
 %% Read the nc file outputted from "example_radionuclides_basic_for_surface.py"
-filename = 'example_radionuclides_output.nc';
+filename = './nc_output/NECB_opnedrift_radionuclides_output.nc';
 % filename = 'simulation_radionuclides_Fukutoku-Okanoba_output.nc';
 % filename = './consult/example_radionuclides_output.nc';
 ncdisp(filename);
