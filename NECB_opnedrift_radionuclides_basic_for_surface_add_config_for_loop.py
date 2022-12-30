@@ -11,16 +11,32 @@ from datetime import timedelta, datetime
 import numpy as np
 import netCDF4 as nc
 from pprint import pprint
+import os
 
 # Boundary dates
-start_date = datetime(2014, 1, 1)
+start_date = datetime(1993, 1, 1)
 end_date = datetime(2019, 12, 31)
 days_diff = end_date - start_date
 num_days = days_diff.days+1
 print('From '+str({start_date})+' to '+str({end_date})+' : '+str(num_days)+' days')
 # print(num_days)
 
-num_of_simulation_days = 90
+latseed = 18.375;   lonseed = 122.875 # Kuroshio upstream
+saving_dir = 'D:/Data/used_by_projects/Pacific-Opendrift/nc_output/Kuroshio_upstream_path'
+# latseed= 21.125;   lonseed= 122.375 # Kuroshio at Luzon
+# saving_dir = 'D:/Data/used_by_projects/Pacific-Opendrift/nc_output/Kuroshio_Luzon_path'
+num_of_simulation_days = 150
+ntraj = 1000 # number of trajectory
+seed_radius = 100 # km
+saving_path_1 = f'{saving_dir}/number_of_trajectory_{ntraj:0.0f}'
+saving_path = f'{saving_path_1}/seed_radius_km_{seed_radius:0.0f}/init_lat_{latseed}_lon_{lonseed}'
+is_exist = os.path.exists(saving_path)
+if is_exist is False:
+    os.makedirs(saving_path)
+else:
+    print('The directory has already existed.')
+    pass
+print(saving_path)
 
 final_date = end_date + timedelta(days = num_of_simulation_days)
 
@@ -36,42 +52,7 @@ for i in range(0, num_days):
             reader_ncfile_year_i_2 = reader_netCDF_CF_generic.Reader(file_name_year_i_2)
             o.add_reader([reader_ncfile_year_i_1,reader_ncfile_year_i_2],
                                 variables=['sea_floor_depth_below_sea_level','x_sea_water_velocity', 'y_sea_water_velocity','land_binary_mask'])
-        # # file_name = './pre_process/processed_data/my_cmems_2000_1.nc'
-        # # reader_ncfile = reader_netCDF_CF_generic.Reader(file_name)
-        # # pprint(reader_ncfile)
-        # # o.add_reader([reader_ncfile],variables=['sea_floor_depth_below_sea_level','x_sea_water_velocity', 'y_sea_water_velocity'])
-        # # file_name_2000_1 = 'D:/Data/used_by_projects/Pacific-Opendrift/CMEMS/my_cmems_2000_1.nc'
-        # # reader_ncfile_2000_1 = reader_netCDF_CF_generic.Reader(file_name_2000_1)
-        # # # pprint(reader_ncfile_2)
-        # # file_name_2000_2 = 'D:/Data/used_by_projects/Pacific-Opendrift/CMEMS/my_cmems_2000_2.nc'
-        # # reader_ncfile_2000_2 = reader_netCDF_CF_generic.Reader(file_name_2000_2)
-        # # # pprint(reader_ncfile_2)
-        # # file_name_2001_1 = 'D:/Data/used_by_projects/Pacific-Opendrift/CMEMS/my_cmems_2001_1.nc'
-        # # reader_ncfile_2001_1 = reader_netCDF_CF_generic.Reader(file_name_2001_1)
-        # # # pprint(reader_ncfile_3)
-        # # file_name_2001_2 = 'D:/Data/used_by_projects/Pacific-Opendrift/CMEMS/my_cmems_2001_2.nc'
-        # # reader_ncfile_2001_2 = reader_netCDF_CF_generic.Reader(file_name_2001_2)
-        # file_name_2010_1 = 'D:/Data/used_by_projects/Pacific-Opendrift/CMEMS/my_cmems_2010_1.nc'
-        # reader_ncfile_2010_1 = reader_netCDF_CF_generic.Reader(file_name_2010_1)
-        # file_name_2010_2 = 'D:/Data/used_by_projects/Pacific-Opendrift/CMEMS/my_cmems_2010_2.nc'
-        # reader_ncfile_2010_2 = reader_netCDF_CF_generic.Reader(file_name_2010_2)
-        # file_name_2011_1 = 'D:/Data/used_by_projects/Pacific-Opendrift/CMEMS/my_cmems_2011_1.nc'
-        # reader_ncfile_2011_1 = reader_netCDF_CF_generic.Reader(file_name_2011_1)
-        # pprint(reader_ncfile_2011_1)
-        # file_name_2011_2 = 'D:/Data/used_by_projects/Pacific-Opendrift/CMEMS/my_cmems_2011_2.nc'
-        # reader_ncfile_2011_2 = reader_netCDF_CF_generic.Reader(file_name_2011_2)
-
-
-        # o.add_reader([reader_ncfile_2010_1,reader_ncfile_2010_2],
-        #                         variables=['sea_floor_depth_below_sea_level','x_sea_water_velocity', 'y_sea_water_velocity','land_binary_mask'])
-        # o.add_reader([reader_ncfile_2011_1,reader_ncfile_2011_2],
-        #                         variables=['sea_floor_depth_below_sea_level','x_sea_water_velocity', 'y_sea_water_velocity','land_binary_mask'])
         
-        # # reader_landmask = reader_global_landmask.Reader(
-        # #                     extent=[-180, 0, 190, 63])  # lonmin, latmin, lonmax, latmax
-        # # pprint(reader_landmask)
-        # # o.add_reader(reader_landmask)
-        # # o.add_reader(reader_landmask, variables=['land_binary_mask'])
 
         # # Adjusting some configuration
         # # o.set_config()
@@ -92,16 +73,14 @@ for i in range(0, num_days):
         td=start_date+timedelta(days=i)
         time_i = datetime(td.year, td.month, td.day, 0)
 
-        latseed= 18.375;   lonseed= 122.875 # Kuroshio upstream
-        output_filename_0 = "D:/Data/used_by_projects/Pacific-Opendrift/nc_output/Kuroshio_upstream_path/Opendrift_Kuroshio_upstream_path_{txt_year:04.0f}_{txt_month:02.0f}_{txt_day:02.0f}.nc"
-        # latseed= 21.125;   lonseed= 122.375 # Kuroshio at Luzon
-        # output_filename_0 = "D:/Data/used_by_projects/Pacific-Opendrift/nc_output/Kuroshio_Luzon_path/Opendrift_Kuroshio_Luzon_path_{txt_year:04.0f}_{txt_month:02.0f}_{txt_day:02.0f}.nc"
-
-        ntraj=1000 # number of trajectory
+        output_filename = f"{saving_path}/Opendrift_{num_of_simulation_days:02.0f}days_Kuroshio_upstream_path_{td.year:04.0f}_{td.month:02.0f}_{td.day:02.0f}.nc"
+        # output_filename = f"{saving_path}/Opendrift_{num_of_simulation_days:02.0f}days_Kuroshio_Luzon_path_{td.year:04.0f}_{td.month:02.0f}_{td.day:02.0f}.nc"
+    
+        
         iniz=np.linspace(0.,0.,ntraj) # seeding the radionuclides in the upper 0m (surface) 
         terminal_velocity = 0 # Neutral particles (No Rising, no sinking)
 
-        o.seed_elements(lonseed, latseed, z=iniz, radius=100,number=ntraj,time=time_i)
+        o.seed_elements(lonseed, latseed, z=iniz, radius=seed_radius,number=ntraj,time=time_i)
         # o.seed_elements(lonseed, latseed, z=iniz, radius=1000,number=ntraj,time=time,density=0.01,terminal_velocity=terminal_velocity,diameter=0.5,neutral_buoyancy_salinity=36.1,current_drift_factor=0.9)
         # o.seed_elements(lonseed, latseed, z=..., radius=...,number=...,time=...,density=..., neutral_buoyancy_salinity=...,specie =...,wind_drift_factor=...,
         # current_drift_factor=...,terminal_velocity=...,origin_marker=...)
@@ -115,14 +94,10 @@ for i in range(0, num_days):
         #%%
         # Running model (save to nc file)
         o.list_configspec()
-        # o.run(steps=60, time_step=timedelta(days=1), time_step_output=timedelta(days=1))
-        
-        output_filename = output_filename_0.format(txt_year = td.year,txt_month = td.month,txt_day = td.day)
-        
         o.run(steps=num_of_simulation_days, time_step=timedelta(days=1), time_step_output=timedelta(days=1),outfile=output_filename)
         # o.run(steps=90, time_step=timedelta(days=1), time_step_output=timedelta(days=1),outfile='./nc_output/NECB_opnedrift_radionuclides_output_test.nc')
         print("Saving ",output_filename, " completed.")
-    except TypeError:
+    except TypeError or ValueError:
          # 👇️ this runs
-        print('The specified type is not correct.')
+        print('The specified type or value is not correct.')
         pass  # 👈️ ignore the error
