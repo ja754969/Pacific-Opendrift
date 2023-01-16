@@ -1,8 +1,8 @@
 clear;clc;close all;
 folder = pwd;
-%%
-start_date = '2010/05/01 00:00:00';
-end_date = '2010/07/31 00:00:00';
+%% Year
+start_year = 1993;
+end_year = 2020;
 %%
 LON_lim = [115 140];
 LAT_lim = [15 40];
@@ -13,24 +13,34 @@ LON_lim_zoomin = [115 140];
 % LAT_lim = [0 60];
 % LON_lim = [100 190];
 %%
-first_date = datetime(start_date,'InputFormat','yyyy/MM/dd HH:mm:SS');
-last_date = datetime(end_date,'InputFormat','yyyy/MM/dd HH:mm:SS');
-index_num = days(last_date-first_date);
+simulation_days = 10;
+%% Find the days
+first_date = datetime(start_year,01,01);
+last_date = datetime(end_year,12,31);
+date_array = first_date:days(1):last_date;
+month_ind = find(month(date_array)>=1 & month(date_array)<=12);
+date_month = date_array(month_ind);
+index_num = length(date_month);
 %%
 lon_input = [];
 lat_input = [];
 for i = 1:index_num
     %%
-    the_date = first_date+days(1)*(i*1-1);
+    the_date = date_month(i);
     yyyy = num2str(year(the_date));
     MM = num2str(month(the_date),'%02.0f'); 
     dd = num2str(day(the_date),'%02.0f'); 
 %     HH = num2str(hour(the_date),'%02.0f');
     %% Read the nc file outputted from "Python"
-    filename = ['./nc_output/Kuroshio_Luzon_path/Opendrift_Kuroshio_Luzon_path_' ...
+%     filename = ['D:/Data/used_by_projects/Pacific-Opendrift/nc_output/' ...
+%         'Kuroshio_Luzon_path/number_of_trajectory_1000/seed_radius_km_100/' ...
+%         'init_lat_21.125_lon_122.375/Opendrift_90days_Kuroshio_Luzon_path_' ...
+%         yyyy '_' MM '_' dd '.nc'];
+    filename = ['D:/Data/used_by_projects/Pacific-Opendrift/nc_output/' ...
+        'Kuroshio_upstream_path/number_of_trajectory_1000/seed_radius_km_100/' ...
+        'init_lat_18.375_lon_122.875/Opendrift_' num2str(simulation_days) ...
+        'days_Kuroshio_upstream_path_' ...
         yyyy '_' MM '_' dd '.nc'];
-    % filename = 'simulation_radionuclides_Fukutoku-Okanoba_output.nc';
-    % filename = './consult/example_radionuclides_output.nc';
     ncdisp(filename);
     %% Read the variables from the nc file
     trajectory = nc_varget(filename,'trajectory');
@@ -139,6 +149,11 @@ for ind = not_stranded_trajectory
 %     hold on;
 end
 m_grid('tickdir','out','FontSize',25,'FontWeight','bold','LineWidth',3)
-title([char(first_date) ' - ' char(last_date)],'FontSize',15)
+title([num2str(start_year) ' - ' num2str(end_year)],'FontSize',15)
 % lgd = legend([init active],{['initial (' num2str(not_stranded_count) ')'],...
 %     ['active (' num2str(not_stranded_count) ')']});
+saveas(fig,['./image/probabilities_distribution/all/Upstream_' ...
+    num2str(start_year) '-' num2str(end_year) '_all_' num2str(simulation_days) ...
+    'days.png']);
+% saveas(fig,['./image/probabilities_distribution/all/Luzon_' ...
+%     num2str(start_year) '-' num2str(end_year) '_all.png']);

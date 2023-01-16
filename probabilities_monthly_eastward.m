@@ -1,15 +1,21 @@
 clear;clc;close all;
 folder = pwd;
 lon_diff_target = 7;
+number_of_trajectory = 1000;
+simulation_days = 150;
+year_range = 1993:2020;
+year_i_count = 0;
+eastward_probability_all = NaN(length(year_range),12);
+eastward_count_all = NaN(length(year_range),12);
 %%
-for year_i = 2010
+for year_i = year_range
     close all
     %% Year of late spring and early summer
     start_year = year_i;
     end_year = year_i;
-    
+    eastward_probability_month_i_in_year_i = NaN(1,12);
+    eastward_count_month_i_in_year_i = NaN(1,12);
     for month_i = 1:12
-        
         %% Find the days
         first_date = datetime(start_year,month_i,01);
         last_date = datetime(end_year,month_i+1,01)-days(1);
@@ -22,8 +28,11 @@ for year_i = 2010
         lat_input = [];
         lon_init = [];
         lat_init = [];
-        eastward_count = 0;
+        eastward_count_month_i = 0;
+        not_eastward_count_month_i = 0;
+        sum_of_count_month_i = 0;
         trajectories_count = 0;
+        
         for i = 1:index_num
             clc
             %%
@@ -34,16 +43,18 @@ for year_i = 2010
         %     HH = num2str(hour(the_date),'%02.0f');
             %% Read the nc file outputted from "Python"
 %             filename = ['D:/Data/used_by_projects/Pacific-Opendrift/nc_output/' ...
-%                 'Kuroshio_Luzon_path/number_of_trajectory_1000/seed_radius_km_100/' ...
-%                 'init_lat_21.125_lon_122.375/Opendrift_90days_Kuroshio_Luzon_path_' ...
+%                 'Kuroshio_Luzon_path/number_of_trajectory_' ...
+%                 num2str(number_of_trajectory) '/seed_radius_km_100/' ...
+%                 'init_lat_21.125_lon_122.375/Opendrift_' ...
+%                 num2str(simulation_days) 'days_Kuroshio_Luzon_path_' ...
 %                 yyyy '_' MM '_' dd '.nc'];
             filename = ['D:/Data/used_by_projects/Pacific-Opendrift/nc_output/' ...
-                'Kuroshio_upstream_path/number_of_trajectory_1000/seed_radius_km_100/' ...
-                'init_lat_18.375_lon_122.875/Opendrift_90days_Kuroshio_upstream_path_' ...
+                'Kuroshio_upstream_path/number_of_trajectory_' ...
+                num2str(number_of_trajectory) '/seed_radius_km_100/' ...
+                'init_lat_18.375_lon_122.875/Opendrift_' num2str(simulation_days) ...
+                'days_Kuroshio_upstream_path_' ...
                 yyyy '_' MM '_' dd '.nc'];
-            % filename = 'simulation_radionuclides_Fukutoku-Okanoba_output.nc';
-            % filename = './consult/example_radionuclides_output.nc';
-            ncdisp(filename);
+%             ncdisp(filename);
             %% Read the variables from the nc file
             trajectory = nc_varget(filename,'trajectory');
             time = nc_varget(filename,'time'); % seconds since 1970-01-01 00:00:00
@@ -102,16 +113,19 @@ for year_i = 2010
                 %% Find the eastward trajectories
                 lon_diff = lon(trajectory_i,end)-lon(trajectory_i,1);
     %             is_lat_in_range_1 = (lat(trajectory_i,1)>=17 & lat(trajectory_i,1)<=21);
-                is_lat_in_range_end = (lat(trajectory_i,end)>=15 & lat(trajectory_i,end)<=22);
+                is_lat_in_range_end = (lat(trajectory_i,end)>=17 & lat(trajectory_i,end)<=21);
                 
                 if (lon_diff>=lon_diff_target) & (is_lat_in_range_end==true)
                     eastward_trajectory_i = [eastward_trajectory_i trajectory_i];
-                    eastward_count = eastward_count+1;
-                    disp('Stayed.');
+                    eastward_count_month_i = eastward_count_month_i+1;
                 else
-                    disp('Not in the range.');
+                    not_eastward_count_month_i = not_eastward_count_month_i+1;
                 end
+                
             end
+            sum_of_count_month_i = eastward_count_month_i + not_eastward_count_month_i;
+            
+            %%
             stranded_count = length(find(isnan(stranded_marker_lat)==0));
             not_stranded_count = length(trajectory)-stranded_count;
             %% Spatial range of latitude and longitude  
@@ -132,15 +146,24 @@ for year_i = 2010
             lat_init = [lat_init;lat_init_i(:)];
 
         end
+        
+        if sum_of_count_month_i ~= trajectories_count
+            break
+            error('Error occurred.');
+        end
         cd('./function')
         [lon_distribution,lat_distribution,pd_distribution] = ...
             probability_density_distribution([110.125 179.875],[10.125 49.875],...
             0.25,lon_input,lat_input);
         cd(folder)
-        disp(['Trajectories: ' num2str(eastward_count) ' out of ' ...
+        disp(['Trajectories: ' num2str(eastward_count_month_i) ' out of ' ...
             num2str(trajectories_count)  ' are eastward. (' ...
-            num2str(round(eastward_count/trajectories_count*100,2)) '%)'])
-        eastward_probability(month_i) = eastward_count/trajectories_count*100;
+            num2str(round(eastward_count_month_i/trajectories_count*100,2)) '%)'])
+        disp(['Trajectories: ' num2str(not_eastward_count_month_i) ' out of ' ...
+            num2str(trajectories_count)  ' are not eastward. (' ...
+            num2str(round(not_eastward_count_month_i/trajectories_count*100,2)) '%)'])
+        eastward_probability_month_i_in_year_i(1,month_i) = eastward_count_month_i/trajectories_count*100;
+        eastward_count_month_i_in_year_i(1,month_i) = eastward_count_month_i;
     end
     %% Plotting data for checks
     fig = figure;
@@ -150,12 +173,71 @@ for year_i = 2010
     fig.WindowState = 'maximized';
     fig
     ax1 = axes;
-    bar(1:12,eastward_probability);
+    bar(1:12,eastward_probability_month_i_in_year_i);
     xlabel('Month')
     ylabel('%')
     ax1.XTickLabel = {'Jan';'Feb';'Mar';'Apr';'May';'Jun';'Jul';'Aug';'Sep';'Oct';'Nov';'Dec'};
     ax1.FontSize = 20;
-    saveas(fig,['./image/eastward_monthly_probabilities/eastward_more_than_' ...
+    saving_folder = ['./image/eastward_monthly_probabilities/' ...
+        num2str(simulation_days) 'days'];
+    mkdir(saving_folder);
+    saveas(fig,[saving_folder '/eastward_more_than_' ...
         num2str(lon_diff_target) 'deg_' num2str(start_year) '_' num2str(end_year) ...
         '.png']);
+    %%
+    year_i_count = year_i_count+1;
+    eastward_probability_all(year_i_count,1:12) = eastward_probability_month_i_in_year_i;
+    eastward_count_all(year_i_count,1:12) = eastward_count_month_i_in_year_i;
 end
+
+%%
+fig = figure;
+fig.PaperUnits = 'centimeters';
+fig.PaperSize = [29.7 21]; % A4 papersize (horizontal,21-by-29.7 cm,[width height])
+fig.PaperType = '<custom>';
+fig.WindowState = 'maximized';
+fig
+ax2 = axes;
+year_all = 1993:2019;
+hiatus_year_ind = zeros(length(year_all),1);
+hiatus_year_ind(year_all>=1998 & year_all<=2013) = 1;
+plot(1:12,sum(eastward_count_all(find(hiatus_year_ind==1),1:12),1),'rs-',...
+    'MarkerSize',12,'MarkerFaceColor','r'); % hiatus
+hold on;
+plot(1:12,sum(eastward_count_all(find(hiatus_year_ind==0),1:12),1),'bs-',...
+    'MarkerSize',12,'MarkerFaceColor','b'); % non-hiatus
+hold off;
+xlabel('Month');
+ax2.XTick = 1:12;
+ax2.XTickLabel = {'Jan';'Feb';'Mar';'Apr';'May';'Jun';'Jul';'Aug';'Sep';'Oct';'Nov';'Dec'};
+ylabel('Numbers');
+ax2.FontSize = 20;
+saving_folder = ['./image/eastward_monthly_numbers/' num2str(simulation_days) 'days'];
+mkdir(saving_folder);
+saveas(fig,[saving_folder '/eastward_more_than_' ...
+        num2str(lon_diff_target) 'deg_' num2str(year_range(1)) '_' num2str(year_range(end)) ...
+        '_hiatus(red)_and_nonhiatus(blue).png']);
+%%
+fig = figure;
+fig.PaperUnits = 'centimeters';
+fig.PaperSize = [29.7 21]; % A4 papersize (horizontal,21-by-29.7 cm,[width height])
+fig.PaperType = '<custom>';
+fig.WindowState = 'maximized';
+fig
+ax3 = axes;
+year_all = 1993:2019;
+plot(1:12,sum(eastward_count_all(:,1:12),1),'bs-',...
+    'MarkerSize',12,'MarkerFaceColor','b'); % hiatus and non-hiatus
+hold off;
+xlabel('Month');
+ax3.XTick = 1:12;
+ax3.XTickLabel = {'Jan';'Feb';'Mar';'Apr';'May';'Jun';...
+    'Jul';'Aug';'Sep';'Oct';'Nov';'Dec'};
+ylabel('Numbers');
+ax3.FontSize = 20;
+saving_folder = ['./image/eastward_monthly_numbers/' num2str(simulation_days) 'days'];
+mkdir(saving_folder);
+saveas(fig,[saving_folder '/eastward_more_than_' ...
+        num2str(lon_diff_target) 'deg_' ...
+        num2str(year_range(1)) '_' num2str(year_range(end)) ...
+        '_all_time.png']);

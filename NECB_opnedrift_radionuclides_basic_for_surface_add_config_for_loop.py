@@ -14,8 +14,8 @@ from pprint import pprint
 import os
 
 # Boundary dates
-start_date = datetime(1993, 1, 1)
-end_date = datetime(2019, 12, 31)
+start_date = datetime(2020, 1, 1)
+end_date = datetime(2020, 12, 31)
 days_diff = end_date - start_date
 num_days = days_diff.days+1
 print('From '+str({start_date})+' to '+str({end_date})+' : '+str(num_days)+' days')
